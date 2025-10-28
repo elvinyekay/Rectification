@@ -6,8 +6,8 @@ export default function GridShape() {
             className="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none"
             aria-hidden="true"
         >
-            <svg viewBox="0 0 512 512" className="w-[620px] md:w-[760px] xl:w-[900px] text-cyan-500">
-                <defs>
+            <svg viewBox="0 0 512 512" className="w-[320px] md:w-[420px] xl:w-[550px] text-cyan-500">
+            <defs>
                     {/* kənarlara doğru yumşaq solma */}
                     <radialGradient id="fade" r="80%">
                         <stop offset="60%" stopColor="white" />
