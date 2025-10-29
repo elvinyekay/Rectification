@@ -3,11 +3,11 @@ import AuthLayout from "../layout/AuthLayout.tsx";
 import Login from "../pages/AuthPages/SignIn.tsx"
 import ProtectedRoute from "./ProtectedRoute.tsx";
 import AppLayout from "../layout/AppLayout.tsx";
-import Home from "../pages/Dashboard/Home.tsx";
 import Blank from "../pages/Blank.tsx";
 import BasicTables from "../pages/Tables/BasicTables.tsx";
 
 import NotFound from "../pages/OtherPage/NotFound.tsx";
+import RoleLanding from "../pages/Dashboard/RoleLanding.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         path: '/',
-                        element: <Home/>
+                        element: <RoleLanding/>
                     },
                     // {
                     //     path: '/profile',

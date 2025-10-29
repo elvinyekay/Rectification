@@ -19,7 +19,7 @@ export default function AuthLayout({
             <div className="flex flex-col items-center max-w-xs">
               <Link to="/" className="block mb-4">
                   <h1  className="text-center text-6xl text-gray-100 dark:text-white/60">
-                      Rectification
+                      Dürüstləşmə
                   </h1>
               </Link>
 
