@@ -168,7 +168,7 @@ export default function BasicTableOne() {
                               {/* Actions */}
                               <TableCell className="px-4 py-3 text-start">
                                   <div className="inline-flex items-center gap-2">
-                                      <Button variant={"gradient"} color={"teal"} size={"xs"}>
+                                      <Button variant={"gradient"} color={"cyan"} size={"xs"}>
                                           <PencilIcon/>
                                       </Button>
                                       <Button variant={"gradient"} color={"red"} size={"xs"}>

@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import type {BaseQueryFn, FetchArgs} from '@reduxjs/toolkit/query';
-import {setCredentials} from "../slices/authSlice.ts";
+import {setCredentials, logout as logoutAction} from "../slices/authSlice.ts";
 import {RootState} from "../index.ts";
 import {User} from "../../types/auth.ts";
 import {mockUsers} from "../../api/sessionApi/_data/mockUsers.ts";
@@ -85,10 +85,23 @@ export const sessionApi = createApi({
         me: builder.query<User, void>({
             query: () => '/auth/me',
         }),
+        logout: builder.mutation<{ message: string }, void>({
+            query: () => ({
+                url: "auth/logout",
+                method: "POST",
+            }),
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+                try {
+                    await queryFulfilled;
+                } finally {
+                    dispatch(logoutAction());
+                }
+            },
+        }),
     }),
 });
 
-export const {useLoginMutation, useMeQuery} = sessionApi;
+export const {useLoginMutation, useMeQuery, useLogoutMutation} = sessionApi;
 
 
 
