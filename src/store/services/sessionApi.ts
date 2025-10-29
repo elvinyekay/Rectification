@@ -3,7 +3,7 @@ import type {BaseQueryFn, FetchArgs} from '@reduxjs/toolkit/query';
 import {setCredentials} from "../slices/authSlice.ts";
 import {RootState} from "../index.ts";
 import {User} from "../../types/auth.ts";
-import {mockUsers} from "../../mocks/mockUsers.ts";
+import {mockUsers} from "../../api/sessionApi/_data/mockUsers.ts";
 
 interface LoginRequest {
     email: string,
