@@ -11,9 +11,7 @@ const mockBaseQuery: BaseQueryFn<
     unknown,
     unknown
 > = async ({ url, method = "GET", body }) => {
-    // ---- /api/documents/next
     if (url === "/api/documents/next" && method === "GET") {
-        // tap növbəti "new" və ya "in_progress"
         while (cursor < mockDocuments.length && mockDocuments[cursor].status === "submitted") {
             cursor++;
         }
@@ -26,7 +24,6 @@ const mockBaseQuery: BaseQueryFn<
         return { data: {done: false, document: item} as unknown as NextDocResponse };
     }
 
-    // ---- /api/documents/submit
     if (url === "/api/documents/submit" && method === "POST") {
         const { id, updatedOldData } = body as { id: string; updatedOldData?: DocumentItem["oldData"] };
         const idx = mockDocuments.findIndex((d) => d.id === id);

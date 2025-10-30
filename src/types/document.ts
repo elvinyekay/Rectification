@@ -21,6 +21,9 @@ export type DocItem = {
     imageUrl?: string;
     customerName?: string;
     type?: string;
+    scanUrl?: string;
+    oldData?: DocumentOldData;
+    status?: DocumentStatus;
 };
 
 export type NextDoc = { done: false; document: DocItem };
