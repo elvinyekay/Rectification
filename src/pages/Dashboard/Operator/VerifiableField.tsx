@@ -1,9 +1,9 @@
-import  { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Button from "../../../components/ui/button/Button.tsx";
-import {CheckLineIcon, CloseIcon, PencilIcon} from "../../../icons";
-import InputField from "../../../components/form/input/InputField.tsx";
-import Checkbox from "../../../components/form/input/Checkbox.tsx";
+import Button from "../../../components/ui/button/Button";
+import { CheckLineIcon, CloseIcon, PencilIcon } from "../../../icons";
+import InputField from "../../../components/form/input/InputField";
+import Checkbox from "../../../components/form/input/Checkbox";
 
 type VerifiableFieldProps = {
     label: string;
@@ -30,43 +30,48 @@ export default function VerifiableFieldEditable({
 
     const [accepted, setAccepted] = useState(false);
     const [editing, setEditing] = useState(false);
-    const [newValue, setNewValue] = useState("");
 
-    const changed = !accepted && newValue.trim() !== "" && newValue !== originalValue;
-    const finalValue = accepted ? originalValue : (newValue.trim() || originalValue);
+    // draft və commit ayrıldı
+    const [inputValue, setInputValue] = useState("");
+    const [correction, setCorrection] = useState("");
+
+    const correctionExists = correction.trim() !== "";
+    const changed = !accepted && correctionExists && correction !== originalValue;
+    const finalValue = accepted ? originalValue : (correctionExists ? correction : originalValue);
 
     useEffect(() => {
-        onChange?.({ accepted, originalValue, newValue, finalValue, changed });
-    }, [accepted, newValue]); // eslint-disable-line
+        onChange?.({ accepted, originalValue, newValue: correction, finalValue, changed });
+    }, [accepted, correction]);
 
     const startEdit = () => {
-        setAccepted(false);
         setEditing(true);
-        setNewValue((v) => v || originalValue);
+        setInputValue(prev => prev || correction || originalValue);
     };
 
     const cancelEdit = () => {
         setEditing(false);
-        setNewValue("");
-        setAccepted(true);
+        setInputValue(correction || "");
     };
 
     const saveEdit = () => {
-        if (required && newValue.trim() === "") return;
+        const v = inputValue.trim();
+        if (required && v === "") return;
+        setCorrection(v);   // ✅ indi "Düzəliş" göstəriləcək
         setEditing(false);
-        setAccepted(false);
+        setAccepted(false); // düzəliş rejimidir
     };
 
     const toggleAccepted = (checked: boolean) => {
         setAccepted(checked);
         if (checked) {
             setEditing(false);
-            setNewValue("");
+            setInputValue("");
+            setCorrection("");
         }
     };
 
     return (
-        <div className="space-y-2 rounded-xl border border-gray-200 dark:border-gray-800 p-3 mb-2">
+        <div className="space-y-2 rounded-xl border border-gray-200 dark:border-gray-800 p-3">
             <div className="flex items-start justify-between gap-3">
                 <label className="text-xs font-medium text-gray-800 dark:text-gray-100">
                     {label}
@@ -77,20 +82,20 @@ export default function VerifiableFieldEditable({
                         <Checkbox
                             className="h-4 w-4 accent-cyan-600 disabled:opacity-40"
                             checked={accepted}
-                            disabled={editing}
+                            disabled={editing || correctionExists}
                             onChange={toggleAccepted}
                         />
                     </label>
                     <Button
-                        variant={"gradient"}
-                        color={"light"}
-                        size={"xs"}
+                        variant="gradient"
+                        color="light"
+                        size="xs"
                         onClick={startEdit}
-                        disabled={editing}
+                        disabled={editing || accepted}
                         className="ml-1 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 px-2 py-1 text-xs
                        hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-50 transition"
                     >
-                        <PencilIcon/>
+                        <PencilIcon />
                     </Button>
                 </div>
             </div>
@@ -100,14 +105,14 @@ export default function VerifiableFieldEditable({
                     {originalValue || "—"}
                 </div>
 
-                {!accepted && newValue.trim() !== "" && (
+                {!accepted && correctionExists && (
                     <div className="mt-1 flex items-start gap-2">
-                        <span className="inline-flex select-none px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-300 text-xs">
-                            Düzəliş
-                        </span>
+            <span className="inline-flex select-none px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-300 text-xs">
+              Düzəliş
+            </span>
                         <span className="text-gray-900 dark:text-gray-100 break-words">
-                            {newValue}
-                        </span>
+              {correction}
+            </span>
                     </div>
                 )}
             </div>
@@ -124,31 +129,34 @@ export default function VerifiableFieldEditable({
                     >
                         <InputField
                             id={id}
-                            value={newValue}
-                            onChange={(e) => setNewValue(e.target.value)}
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
                             placeholder={placeholder}
-                            aria-invalid={required && newValue.trim() === ""}
+                            aria-invalid={required && inputValue.trim() === ""}
                         />
+
                         <div className="flex items-center gap-2">
                             <Button
-                                variant={"gradient"}
-                                color={"green"}
-                                size={"xs"}
+                                variant="gradient"
+                                color="green"
+                                size="xs"
                                 onClick={saveEdit}
-                                disabled={required && newValue.trim() === ""}
+                                disabled={required && inputValue.trim() === ""}
                             >
-                                 <CheckLineIcon/>
+                                <CheckLineIcon />
                             </Button>
+
                             <Button
-                                variant={"gradient"}
-                                color={"light"}
-                                size={"xs"}
+                                variant="gradient"
+                                color="light"
+                                size="xs"
                                 onClick={cancelEdit}
                             >
-                                <CloseIcon/>
+                                <CloseIcon />
                             </Button>
                         </div>
-                        {required && newValue.trim() === "" && (
+
+                        {required && inputValue.trim() === "" && (
                             <p className="text-xs text-red-600">Bu sahə məcburidir.</p>
                         )}
                     </motion.div>
