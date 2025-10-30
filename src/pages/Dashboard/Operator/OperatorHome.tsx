@@ -8,6 +8,7 @@ import Button from "../../../components/ui/button/Button.tsx";
 import {useState} from "react";
 import {ReverseIcon} from "../../../icons";
 import PDFViewer from "../../../components/PDFViewer";
+import FormSide from "./FormSide.tsx";
 
 
 const OperatorHome = () => {
@@ -53,70 +54,7 @@ const OperatorHome = () => {
 
     // --- RIGHT (form) ---
     const right = (
-        <div className="h-full flex flex-col">
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-800">
-                <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                    Məlumat formu
-                </h3>
-            </div>
-
-            <div className="flex-1 overflow-auto p-4 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label className="block text-xs text-gray-500 mb-1">Müştəri</label>
-                        <input
-                            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 outline-none focus:ring-2 ring-brand-500"
-                            placeholder="Ad Soyad"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-xs text-gray-500 mb-1">Sənəd tipi</label>
-                        <select
-                            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 outline-none focus:ring-2 ring-brand-500"
-                        >
-                            <option value="">Seçin</option>
-                            <option value="passport">Passport</option>
-                            <option value="invoice">Invoice</option>
-                            <option value="other">Digər</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-xs text-gray-500 mb-1">Qeydlər</label>
-                    <textarea
-                        rows={5}
-                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 outline-none focus:ring-2 ring-brand-500"
-                        placeholder="Qısa izahat..."
-                    />
-                </div>
-            </div>
-
-            <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex gap-2 justify-end">
-                <Button
-                    variant={"gradient"}
-                    color={"cyan"}
-                    disabled={isSubmitting}
-                >
-                    Keç
-                </Button>
-                <Button
-                    variant={"gradient"}
-                    color={"red"}
-                    size={"sm"}
-                    disabled={isSubmitting}
-                >
-                    Rədd et
-                </Button>
-                <Button
-                    variant={"gradient"}
-                    color={"green"}
-                    disabled={isSubmitting}
-                >
-                    Təsdiqlə & Növbəti
-                </Button>
-            </div>
-        </div>
+        <FormSide isSubmitting={isSubmitting}/>
     );
 
     return (
