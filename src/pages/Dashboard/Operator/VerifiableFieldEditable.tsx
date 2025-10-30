@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Button from "../../../components/ui/button/Button";
 import { CheckLineIcon, CloseIcon, PencilIcon } from "../../../icons";
 import InputField from "../../../components/form/input/InputField";
-import Checkbox from "../../../components/form/input/Checkbox";
 
 type VerifiableFieldProps = {
     label: string;
@@ -31,21 +30,59 @@ export default function VerifiableFieldEditable({
     const [accepted, setAccepted] = useState(false);
     const [editing, setEditing] = useState(false);
 
-    // draft və commit ayrıldı
+    // draft (input) və commit (correction)
     const [inputValue, setInputValue] = useState("");
     const [correction, setCorrection] = useState("");
 
+    // const editDisabled = accepted;
+
     const correctionExists = correction.trim() !== "";
     const changed = !accepted && correctionExists && correction !== originalValue;
-    const finalValue = accepted ? originalValue : (correctionExists ? correction : originalValue);
+    const finalValue = accepted
+        ? originalValue
+        : correctionExists
+            ? correction
+            : originalValue;
+
+    const base =
+        "rounded-lg p-4 transition-all duration-200  bg-white/80 " +
+        "shadow-sm hover:shadow-md focus-within:shadow-md";
+
+    const stateDefault =
+        "border-gray-200 dark:border-gray-800";
+
+    const stateAccepted =
+        "border-emerald-300 bg-emerald-50/40 " +
+        "ring-1 ring-inset ring-emerald-200/70";
+
+    const stateEditing =
+        "border-amber-300 bg-amber-50/50 " +
+        "ring-1 ring-inset ring-amber-200/80";
+
+    const containerClass =
+        base +
+        " " +
+        (accepted ? stateAccepted : (editing || correctionExists ? stateEditing : stateDefault));
+
+    const btnGhost =
+        "inline-flex items-center justify-center h-8 min-w-8 px-1 rounded-lg " +
+        "border border-gray-100 dark:border-gray-700 bg-neutral-100 " +
+        "hover:bg-gray-50 dark:hover:bg-white/5 shadow-sm " +
+        "transition active:scale-[0.98]";
+
+    const btnDisabled =
+        "opacity-50 pointer-events-none";
+
 
     useEffect(() => {
         onChange?.({ accepted, originalValue, newValue: correction, finalValue, changed });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [accepted, correction]);
 
     const startEdit = () => {
+        setAccepted(false);
         setEditing(true);
-        setInputValue(prev => prev || correction || originalValue);
+        setInputValue((p) => p || correction || originalValue);
     };
 
     const cancelEdit = () => {
@@ -56,47 +93,55 @@ export default function VerifiableFieldEditable({
     const saveEdit = () => {
         const v = inputValue.trim();
         if (required && v === "") return;
-        setCorrection(v);   // ✅ indi "Düzəliş" göstəriləcək
+        setCorrection(v);
         setEditing(false);
-        setAccepted(false); // düzəliş rejimidir
+        setAccepted(false);
     };
 
-    const toggleAccepted = (checked: boolean) => {
-        setAccepted(checked);
-        if (checked) {
-            setEditing(false);
-            setInputValue("");
-            setCorrection("");
+    const acceptNow = () => {
+        if (editing || correctionExists) return;
+        setAccepted(prev => !prev);
+    };
+
+    const handleContextToggle = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (editing) {
+            cancelEdit();
+        } else {
+            startEdit();
         }
     };
 
+
     return (
-        <div className="space-y-2 rounded-xl border border-gray-200 dark:border-gray-800 p-3">
+        <div
+            className={containerClass}
+            onDoubleClick={acceptNow}
+            onContextMenu={handleContextToggle}
+        >
             <div className="flex items-start justify-between gap-3">
-                <label className="text-xs font-medium text-gray-800 dark:text-gray-100">
+                <label className="text-[10px] uppercase tracking-wide font-semibold text-gray-500">
                     {label}
                 </label>
 
                 <div className="flex items-center gap-2">
-                    <label className="inline-flex items-center gap-2 text-sm">
-                        <Checkbox
-                            className="h-4 w-4 accent-cyan-600 disabled:opacity-40"
-                            checked={accepted}
-                            disabled={editing || correctionExists}
-                            onChange={toggleAccepted}
-                        />
-                    </label>
-                    <Button
-                        variant="gradient"
-                        color="light"
-                        size="xs"
-                        onClick={startEdit}
-                        disabled={editing || accepted}
-                        className="ml-1 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 px-2 py-1 text-xs
-                       hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-50 transition"
+                    {/* CHECK */}
+                    <button
+                        onClick={acceptNow}
+                        className={[btnGhost, accepted && "ring-2 ring-emerald-300", (editing || correctionExists) && btnDisabled].join(" ")}
+                        aria-pressed={accepted}
                     >
-                        <PencilIcon />
-                    </Button>
+                        <CheckLineIcon className="w-4 h-4" color={"oklch(69.6% 0.17 162.48)"} />
+                    </button>
+
+                    {/* EDIT */}
+                    <button
+                        onClick={startEdit}
+                        disabled={accepted}
+                        className={[btnGhost, accepted && btnDisabled].join(" ")}
+                    >
+                        <PencilIcon className="w-4 h-4" color={"oklch(75% 0.183 55.934)"} />
+                    </button>
                 </div>
             </div>
 
@@ -107,12 +152,12 @@ export default function VerifiableFieldEditable({
 
                 {!accepted && correctionExists && (
                     <div className="mt-1 flex items-start gap-2">
-            <span className="inline-flex select-none px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-300 text-xs">
-              Düzəliş
-            </span>
+                        <span className="inline-flex select-none px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300 text-sm">
+                            Düzəliş
+                         </span>
                         <span className="text-gray-900 dark:text-gray-100 break-words">
-              {correction}
-            </span>
+                            {correction}
+                        </span>
                     </div>
                 )}
             </div>
@@ -124,7 +169,7 @@ export default function VerifiableFieldEditable({
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
                         className="overflow-hidden space-y-2"
                     >
                         <InputField

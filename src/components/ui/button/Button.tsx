@@ -11,6 +11,7 @@ interface ButtonProps {
     disabled?: boolean;
     className?: string;
     type?: 'button' | 'submit' | 'reset';
+    title?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -24,10 +25,11 @@ const Button: React.FC<ButtonProps> = ({
                                            className = "",
                                            disabled = false,
                                            type = "button",
+    title = "",
                                        }) => {
     // Size Classes
     const sizeClasses = {
-        xs: "px-3 py-2 text-sm",
+        xs: "px-3 py-1 text-sm",
         sm: "px-4 py-3 text-sm",
         md: "px-5 py-3.5 text-sm",
     };
@@ -175,6 +177,7 @@ const Button: React.FC<ButtonProps> = ({
             type={type}
         >
             {startIcon && <span className="flex items-center">{startIcon}</span>}
+            {title && <span className="flex items-center">{title}</span>}
             {children}
             {endIcon && <span className="flex items-center">{endIcon}</span>}
         </button>

@@ -91,7 +91,7 @@ export function ComponentTabs({
                 onKeyDown={onKeys}
                 className="relative mx-auto w-full max-w-5xl rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 px-2 py-1"
             >
-                <div className="flex items-center gap-1 overflow-x-auto">
+                <div className="flex flex-wrap items-center gap-1 gap-y-2">
                     {tabs.map((t) => {
                         const isActive = t.value === active;
                         const isDisabled = !!t.disabled;
@@ -111,7 +111,7 @@ export function ComponentTabs({
                                 {isActive && (
                                     <motion.span
                                         layoutId={`tab-pill-${scopeId}`}
-                                        className="absolute inset-0 rounded-xl bg-white xs"
+                                        className="absolute inset-0 rounded-xl bg-white pointer-events-none z-0"
                                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                     />
                                 )}

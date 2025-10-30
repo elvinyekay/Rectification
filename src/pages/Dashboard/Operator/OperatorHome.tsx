@@ -59,6 +59,7 @@ const OperatorHome = () => {
 
     return (
         <div className="h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)]">
+
             <div
                 className="flex items-center justify-center gap-2 px-3 pb-1 border-b border-gray-200 dark:border-gray-800">
                 <Button
