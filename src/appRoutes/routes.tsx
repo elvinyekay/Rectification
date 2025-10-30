@@ -8,6 +8,7 @@ import BasicTables from "../pages/Tables/BasicTables.tsx";
 
 import NotFound from "../pages/OtherPage/NotFound.tsx";
 import RoleLanding from "../pages/Dashboard/RoleLanding.tsx";
+import OperatorHome from "../pages/Dashboard/Operator/OperatorHome.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -45,6 +46,10 @@ export const router = createBrowserRouter([
                     {
                         path: '/tables',
                         element: <BasicTables />
+                    },
+                    {
+                        path: '/operator/work',
+                        element: <OperatorHome />
                     },
                     // {
                     //     path: '/alerts',

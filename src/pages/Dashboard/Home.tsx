@@ -1,6 +1,6 @@
 import {useAppSelector} from "../../store/hooks.ts";
 import AdminHome from "./AdminHome.tsx";
-import OperatorHome from "./OperatorHome.tsx";
+import OperatorHome from "./Operator/OperatorHome.tsx";
 import SupervisorHome from "./SupervisorHome.tsx";
 
 

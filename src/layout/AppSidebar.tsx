@@ -3,7 +3,7 @@ import {Link, useLocation} from "react-router";
 
 import {
     ChevronDownIcon, DocsIcon,
-    HorizontaLDots, ListIcon,
+    HorizontaLDots, ListIcon, TaskIcon,
 } from "../icons";
 import {useSidebar} from "../context/SidebarContext";
 import {Role} from "../types/auth.ts";
@@ -28,7 +28,13 @@ const navItems: NavItem[] = [
         icon: <DocsIcon/>,
         name: "Sənədlər",
         path: "/tables",
-        roles: ['admin', 'operator', 'supervisor']
+        roles: ['admin', 'supervisor']
+    },
+    {
+        icon: <TaskIcon/>,
+        name: "Iş paneli",
+        path: "/operator/work",
+        roles: ['operator']
     },
 ];
 

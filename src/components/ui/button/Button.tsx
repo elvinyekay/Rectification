@@ -86,6 +86,7 @@ const Button: React.FC<ButtonProps> = ({
         default: "bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800",
         dark: "bg-gradient-to-r from-gray-700 to-gray-900 text-white hover:from-gray-800 hover:to-black",
         yellow: "bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 hover:from-yellow-500 hover:to-yellow-700",
+        light: "bg-gradient-to-r from-neutral-50 to-neutral-100 text-neutral-700 hover:from-neutral-100 hover:to-neutral-200 hover:text-cyan-800 border border-cyan-100 shadow-sm hover:shadow-md transition-all duration-200",
     };
 
     // Pill Variant Classes
@@ -105,9 +106,10 @@ const Button: React.FC<ButtonProps> = ({
         pink: "bg-pink-600 text-white hover:bg-pink-700 dark:bg-pink-600 dark:hover:bg-pink-700",
     };
 
-    // Primary Variant Classes
-    const primaryClasses = "bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300";
-
+    const primaryClasses = {
+        default: "bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300",
+        light: "bg-brand-100 text-brand-700 border border-brand-200 hover:bg-brand-200 shadow-none disabled:bg-brand-50 disabled:text-brand-400 dark:bg-brand-900/30 dark:text-brand-300 dark:border-brand-700 dark:hover:bg-brand-800/50",
+    };
     // Get the appropriate classes based on variant and color
     const getVariantClasses = () => {
         if (variant === "primary") return primaryClasses;
