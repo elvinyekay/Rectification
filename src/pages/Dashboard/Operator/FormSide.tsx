@@ -1,4 +1,5 @@
 import Button from "../../../components/ui/button/Button.tsx";
+import VerifiableField from "./VerifiableField.tsx";
 
 interface Props {
     isSubmitting: boolean
@@ -6,20 +7,27 @@ interface Props {
 
 const FormSide = ({isSubmitting}:Props) => {
     return (
-        <div className="h-full flex flex-col">
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-800">
-                <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                    Məlumat formu
-                </h3>
-            </div>
+        <div className="h-full flex flex-col mx-2 my-2">
 
+
+            <VerifiableField
+                label="Sənədin seriya nömrəsi"
+                originalValue="12saxw232"
+                onChange={(v) => {console.log(v);}}
+            />
+
+            <VerifiableField
+                label="Sənədin adı"
+                originalValue="ev çıxarışı"
+                onChange={(v) => {console.log(v);}}
+            />
 
 
             <div className="p-4 border-t border-gray-200 dark:border-gray-800 flex gap-2 justify-end">
                 <Button
                     variant={"gradient"}
                     color={"cyan"}
-                    size={"sm"}
+                    size={"xs"}
                     disabled={isSubmitting}
                 >
                     Keç
@@ -27,7 +35,7 @@ const FormSide = ({isSubmitting}:Props) => {
                 <Button
                     variant={"gradient"}
                     color={"red"}
-                    size={"sm"}
+                    size={"xs"}
                     disabled={isSubmitting}
                 >
                     Rədd et
@@ -35,7 +43,7 @@ const FormSide = ({isSubmitting}:Props) => {
                 <Button
                     variant={"gradient"}
                     color={"green"}
-                    size={"sm"}
+                    size={"xs"}
                     disabled={isSubmitting}
                 >
                     Təsdiqlə & Növbəti
