@@ -36,12 +36,12 @@ const navItems: NavItem[] = [
         path: "/operator/work",
         roles: ['operator']
     },
-    {
-        icon: <TaskIcon/>,
-        name: "Pdf trim",
-        path: "/rectify/auto",
-        roles: ['operator']
-    },
+    // {
+    //     icon: <TaskIcon/>,
+    //     name: "Pdf trim",
+    //     path: "/rectify/auto",
+    //     roles: ['operator']
+    // },
 ];
 
 const othersItems: NavItem[] = [];

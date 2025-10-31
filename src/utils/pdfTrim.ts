@@ -10,6 +10,8 @@ export async function autoTrimPdfByText(
     fileOrBuffer: File | ArrayBuffer,
     paddingPt = 18
 ): Promise<Uint8Array> {
+    const pad = Number.isFinite(paddingPt) ? paddingPt : 0;
+
     // 1) Orijinalı oxu
     const originalBuf =
         fileOrBuffer instanceof File ? await fileOrBuffer.arrayBuffer() : fileOrBuffer;
@@ -53,7 +55,6 @@ export async function autoTrimPdfByText(
         if (!Number.isFinite(minX)) {
             boxes.push({ minX:0, minY:0, maxX:vp.width, maxY:vp.height });
         } else {
-            const pad = Number.isFinite(paddingPt) ? paddingPt : 0;
             boxes.push({
                 minX: Math.max(0, minX - pad),
                 minY: Math.max(0, minY - pad),
@@ -85,7 +86,19 @@ export async function autoTrimPdfByText(
         }
         const x = Number.isFinite(b.minX) ? b.minX : 0;
         const y = Number.isFinite(b.minY) ? b.minY : 0;
-        p.setCropBox(x, y, w, h);
+        try {
+            p.setCropBox(x, y, w, h);
+        } catch (error) {
+            console.error("autoTrimPdfByText: crop application failed", {
+                pageIndex: i + 1,
+                cropX: x,
+                cropY: y,
+                cropW: w,
+                cropH: h,
+                error,
+            });
+            throw error;
+        }
     });
 
     return await doc.save();

@@ -1,6 +1,7 @@
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.entry";
 import { PDFDocument } from "pdf-lib";
+import type { PDFPageProxy } from "pdfjs-dist/types/src/display/api";
 
 type Box = { minX:number; minY:number; maxX:number; maxY:number };
 const clamp = (v:number,min:number,max:number)=>Math.min(max,Math.max(min,v));
@@ -25,7 +26,7 @@ function otsuThreshold(gray: Uint8ClampedArray): number {
 }
 
 /** Bir səhifə üçün piksel əsaslı bbox (üst-sol mənşə – viewport koordinatı) */
-async function pixelBox(page:any, scale=1.25): Promise<Box> {
+async function pixelBox(page:PDFPageProxy, scale=1.25): Promise<Box> {
     const vp = page.getViewport({ scale });
     const vpWidth = Math.ceil(vp.width);
     const vpHeight = Math.ceil(vp.height);
@@ -46,7 +47,7 @@ async function pixelBox(page:any, scale=1.25): Promise<Box> {
         console.warn("pixelBox: canvas 2d context unavailable, using full page");
         return { minX: 0, minY: 0, maxX: vp.width, maxY: vp.height };
     }
-    await page.render({ canvasContext: ctx as any, viewport: vp }).promise;
+    await page.render({ canvasContext: ctx , viewport: vp }).promise;
 
     const { data, width, height } = ctx.getImageData(0,0,canvas.width,canvas.height);
 
@@ -80,8 +81,9 @@ async function pixelBox(page:any, scale=1.25): Promise<Box> {
     if (maxX<0 || maxY<0) return { minX:0, minY:0, maxX:vp.width, maxY:vp.height };
 
     // canvas px → viewport pt (scale-ə görə)
-    const sx = (x:number)=> x/scale;
-    const sy = (y:number)=> y/scale;
+    const denom = scale > 0 ? scale : 1;
+    const sx = (x:number)=> x/denom;
+    const sy = (y:number)=> y/denom;
 
     return { minX:sx(minX), minY:sy(minY), maxX:sx(maxX), maxY:sy(maxY) };
 }
@@ -92,6 +94,9 @@ export async function autoTrimPdfByPixels(
     paddingPt = 12,   // kəsimdən sonra əlavə boşluq
     renderScale = 1.25
 ): Promise<Uint8Array> {
+    const pad = Number.isFinite(paddingPt) ? paddingPt : 0;
+    const safeScale = Number.isFinite(renderScale) && renderScale > 0 ? renderScale : 1;
+
     // detach probleminə qarşı iki nüsxə
     const source = fileOrBuffer instanceof File ? await fileOrBuffer.arrayBuffer() : fileOrBuffer;
     const bufForJs = source.slice(0);
@@ -111,7 +116,7 @@ export async function autoTrimPdfByPixels(
             continue;
         }
 
-        const box = await pixelBox(page, renderScale);
+        const box = await pixelBox(page, safeScale);
 
         const values = [box.minX, box.minY, box.maxX, box.maxY];
         if (values.some((v) => !Number.isFinite(v))) {
@@ -120,10 +125,10 @@ export async function autoTrimPdfByPixels(
         }
 
         // padding + sərhəd yoxlaması
-        const minX = clamp(box.minX - paddingPt, 0, vp.width);
-        const minY = clamp(box.minY - paddingPt, 0, vp.height);
-        const maxX = clamp(box.maxX + paddingPt, 0, vp.width);
-        const maxY = clamp(box.maxY + paddingPt, 0, vp.height);
+        const minX = clamp(box.minX - pad, 0, vp.width);
+        const minY = clamp(box.minY - pad, 0, vp.height);
+        const maxX = clamp(box.maxX + pad, 0, vp.width);
+        const maxY = clamp(box.maxY + pad, 0, vp.height);
 
         const paddedValues = [minX, minY, maxX, maxY];
         if (paddedValues.some((v) => !Number.isFinite(v))) {
@@ -153,11 +158,17 @@ export async function autoTrimPdfByPixels(
             continue;
         }
 
-        const p = doc.getPage(i-1);
-        p.setCropBox(cropX, cropY, cropW, cropH);
-        if ((p as any).setMediaBox) (p as any).setMediaBox({ x: cropX, y: cropY, width: cropW, height: cropH });
-        if ((p as any).setTrimBox) (p as any).setTrimBox({ x: cropX, y: cropY, width: cropW, height: cropH });
-        if ((p as any).setBleedBox) (p as any).setBleedBox({ x: cropX, y: cropY, width: cropW, height: cropH });
+        const cropPayload = { pageIndex: i, cropX, cropY, cropW, cropH };
+        try {
+            const p = doc.getPage(i - 1);
+            p.setCropBox?.(cropX, cropY, cropW, cropH);
+            p.setMediaBox?.(cropX, cropY, cropW, cropH);
+            p.setTrimBox?.(cropX, cropY, cropW, cropH);
+            p.setBleedBox?.(cropX, cropY, cropW, cropH);
+        } catch (error) {
+            console.error("autoTrimPdfByPixels: crop application failed", { ...cropPayload, error });
+            throw error;
+        }
     }
 
     return await doc.save();
