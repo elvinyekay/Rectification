@@ -46,7 +46,7 @@ export default function VerifiableFieldEditable({
 
     const base =
         "rounded-lg p-4 transition-all duration-200  bg-white/80 " +
-        "shadow-sm hover:shadow-md focus-within:shadow-md";
+        "shadow-xs hover:shadow-sm focus-within:shadow-md";
 
     const stateDefault =
         "border-gray-200 dark:border-gray-800";

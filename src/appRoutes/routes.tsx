@@ -9,6 +9,7 @@ import BasicTables from "../pages/Tables/BasicTables.tsx";
 import NotFound from "../pages/OtherPage/NotFound.tsx";
 import RoleLanding from "../pages/Dashboard/RoleLanding.tsx";
 import OperatorHome from "../pages/Dashboard/Operator/OperatorHome.tsx";
+import AutoTrimPage from "../pages/Dashboard/Operator/AutoTrimPage.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
                     {
                         path: '/',
                         element: <RoleLanding/>
+                    },
+                    {
+                        path: '/rectify/auto',
+                        element: <AutoTrimPage/>
                     },
                     // {
                     //     path: '/profile',
