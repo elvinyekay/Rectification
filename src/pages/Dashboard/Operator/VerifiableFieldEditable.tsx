@@ -1,8 +1,9 @@
-import { useEffect, useId, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {useEffect, useId, useState} from "react";
+import {motion, AnimatePresence} from "framer-motion";
 import Button from "../../../components/ui/button/Button";
-import { CheckLineIcon, CloseIcon, PencilIcon } from "../../../icons";
+import {CheckLineIcon, CloseIcon, PencilIcon} from "../../../icons";
 import InputField from "../../../components/form/input/InputField";
+import Tooltip from "../../../components/Tooltip.tsx";
 
 type VerifiableFieldProps = {
     label: string;
@@ -29,6 +30,7 @@ export default function VerifiableFieldEditable({
 
     const [accepted, setAccepted] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
     // draft (input) və commit (correction)
     const [inputValue, setInputValue] = useState("");
@@ -46,36 +48,29 @@ export default function VerifiableFieldEditable({
 
     const base =
         "rounded-lg p-4 transition-all duration-200  bg-white/80 " +
-        "shadow-xs hover:shadow-sm focus-within:shadow-md";
+        "shadow-xs hover:shadow-sm focus-within:shadow-md relative";
 
     const stateDefault =
-        "border-gray-200 dark:border-gray-800";
+        "border border-gray-200 dark:border-gray-700";
 
     const stateAccepted =
-        "border-emerald-300 bg-emerald-50/40 " +
-        "ring-1 ring-inset ring-emerald-200/70";
+        "border border-emerald-500/80 dark:border-emerald-400/70 " +
+        "bg-emerald-500/5 dark:bg-emerald-400/5 " +
+        "shadow-sm shadow-emerald-200/30 dark:shadow-emerald-900/30";
 
     const stateEditing =
-        "border-amber-300 bg-amber-50/50 " +
-        "ring-1 ring-inset ring-amber-200/80";
+        "border border-amber-500/80 dark:border-amber-400/70 " +
+        "bg-amber-500/5 dark:bg-amber-400/5 " +
+        "shadow-sm shadow-amber-200/30 dark:shadow-amber-900/30";
 
     const containerClass =
         base +
         " " +
         (accepted ? stateAccepted : (editing || correctionExists ? stateEditing : stateDefault));
 
-    const btnGhost =
-        "inline-flex items-center justify-center h-8 min-w-8 px-1 rounded-lg " +
-        "border border-gray-100 dark:border-gray-700 bg-neutral-100 " +
-        "hover:bg-gray-50 dark:hover:bg-white/5 shadow-sm " +
-        "transition active:scale-[0.98]";
-
-    const btnDisabled =
-        "opacity-50 pointer-events-none";
-
 
     useEffect(() => {
-        onChange?.({ accepted, originalValue, newValue: correction, finalValue, changed });
+        onChange?.({accepted, originalValue, newValue: correction, finalValue, changed});
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [accepted, correction]);
 
@@ -112,53 +107,100 @@ export default function VerifiableFieldEditable({
         }
     };
 
+    // Enter və Escape key handler
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            saveEdit();
+        } else if (e.key === "Escape") {
+            e.preventDefault();
+            cancelEdit();
+        }
+    };
+
 
     return (
         <div
             className={containerClass}
             onDoubleClick={acceptNow}
             onContextMenu={handleContextToggle}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <div className="flex items-start justify-between gap-3">
-                <label className="text-[10px] uppercase tracking-wide font-semibold text-gray-500">
+                <label className="text-[10px] uppercase tracking-wide font-semibold text-gray-500 pb-1">
                     {label}
                 </label>
 
-                <div className="flex items-center gap-2">
-                    {/* CHECK */}
-                    <button
-                        onClick={acceptNow}
-                        className={[btnGhost, accepted && "ring-2 ring-emerald-300", (editing || correctionExists) && btnDisabled].join(" ")}
-                        aria-pressed={accepted}
-                    >
-                        <CheckLineIcon className="w-4 h-4" color={"oklch(69.6% 0.17 162.48)"} />
-                    </button>
+                <div className="absolute top-4 right-4 h-8 w-fit">
+                    {isHovered && (
+                        <motion.div
+                            className="flex items-center gap-2"
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}}
+                            transition={{duration: 0.15}}
+                        >
+                            {/* CHECK */}
+                            <Tooltip text={"Təsdiq et"} position={"top"}>
+                                <Button
+                                    variant={"ghost"}
+                                    size={"compact"}
+                                    onClick={acceptNow}
+                                    color={"minimal"}
+                                    disabled={accepted}
+                                    className={`${editing ? "opacity-40" : ""}`}
+                                >
+                                    <CheckLineIcon
+                                        className={`w-4 h-4 ${accepted ? "text-emerald-500 dark:text-emerald-400" : ""}`}
+                                    />
+                                </Button>
+                            </Tooltip>
 
-                    {/* EDIT */}
-                    <button
-                        onClick={startEdit}
-                        disabled={accepted}
-                        className={[btnGhost, accepted && btnDisabled].join(" ")}
-                    >
-                        <PencilIcon className="w-4 h-4" color={"oklch(75% 0.183 55.934)"} />
-                    </button>
+                            {/* EDIT */}
+                            <Tooltip text={"Düzəliş et"} position={"top"}>
+                                <Button
+                                    onClick={startEdit}
+                                    disabled={accepted}
+                                    size={"compact"}
+                                    variant={"ghost"}
+                                    color={"minimal"}
+                                >
+                                    <PencilIcon
+                                        className={`w-4 h-4 ${editing ? "text-amber-500 dark:text-amber-400" : ""}`}
+                                    />
+                                </Button>
+                            </Tooltip>
+                        </motion.div>
+                    )}
                 </div>
             </div>
 
             <div className="text-md">
-                <div className="text-gray-800 dark:text-gray-200 break-words">
+                <div className="text-gray-800 dark:text-gray-200 break-words pb-2">
                     {originalValue || "—"}
                 </div>
 
                 {!accepted && correctionExists && (
-                    <div className="mt-1 flex items-start gap-2">
-                        <span className="inline-flex select-none px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300 text-sm">
-                            Düzəliş
-                         </span>
-                        <span className="text-gray-900 dark:text-gray-100 break-words">
-                            {correction}
-                        </span>
-                    </div>
+                    <motion.div
+                        initial={{opacity: 0, y: -5}}
+                        animate={{opacity: 1, y: 0}}
+                        exit={{opacity: 0, y: -5}}
+                        className="mt-2 pt-2 border-t border-amber-200 dark:border-amber-900/20"
+                    >
+                        <div className="flex items-center gap-2 text-sm">
+                            {/* Badge */}
+                            <span
+                                className="inline-flex select-none px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 font-semibold text-xs whitespace-nowrap">
+                                Düzəliş
+                            </span>
+                            {/* Value with highlight */}
+                            <span
+                                className="text-amber-600 dark:text-amber-200 font-medium break-words bg-amber-50/50 dark:bg-amber-950/20 px-2 py-1 rounded">
+                                {correction}
+                            </span>
+                        </div>
+                    </motion.div>
                 )}
             </div>
 
@@ -166,18 +208,21 @@ export default function VerifiableFieldEditable({
                 {editing && (
                     <motion.div
                         key="edit-field"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25, ease: "easeOut" }}
+                        initial={{opacity: 0, height: 0}}
+                        animate={{opacity: 1, height: "auto"}}
+                        exit={{opacity: 0, height: 0}}
+                        transition={{duration: 0.25, ease: "easeOut"}}
                         className="overflow-hidden space-y-2"
                     >
                         <InputField
                             id={id}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
                             placeholder={placeholder}
                             aria-invalid={required && inputValue.trim() === ""}
+                            className={"!px-3 !py-0 !h-9 "}
+                            autoFocus
                         />
 
                         <div className="flex items-center gap-2">
@@ -188,16 +233,16 @@ export default function VerifiableFieldEditable({
                                 onClick={saveEdit}
                                 disabled={required && inputValue.trim() === ""}
                             >
-                                <CheckLineIcon />
+                                <CheckLineIcon/>
                             </Button>
 
                             <Button
                                 variant="gradient"
                                 color="light"
-                                size="xs"
+                                size="compact"
                                 onClick={cancelEdit}
                             >
-                                <CloseIcon />
+                                <CloseIcon/>
                             </Button>
                         </div>
 

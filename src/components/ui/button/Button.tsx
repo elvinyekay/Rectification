@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 
 interface ButtonProps {
-    children: ReactNode;
-    size?: "sm" | "md" | "xs";
-    variant?: "primary" | "outline" | "gradient" | "pill" | "outline-gradient";
-    color?: "default" | "dark" | "green" | "red" | "yellow" | "purple" | "blue" | "cyan" | "teal" | "lime" | "pink" | "alternative" | "light";
+    children?: ReactNode;
+    size?: "sm" | "md" | "xs" | "compact";
+    variant?: "primary" | "outline" | "gradient" | "pill" | "outline-gradient" | "ghost";
+    color?: "default" | "dark" | "green" | "red" | "yellow" | "purple" | "blue" | "cyan" | "teal" | "lime" | "pink" | "alternative" | "light" | "neutral"| "soft-dark" | "minimal" | "muted";
     startIcon?: ReactNode;
     endIcon?: ReactNode;
     onClick?: () => void;
@@ -12,6 +12,7 @@ interface ButtonProps {
     className?: string;
     type?: 'button' | 'submit' | 'reset';
     title?: string;
+    loading?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -25,13 +26,37 @@ const Button: React.FC<ButtonProps> = ({
                                            className = "",
                                            disabled = false,
                                            type = "button",
-    title = "",
+                                           title = "",
+                                           loading = false,
                                        }) => {
     // Size Classes
     const sizeClasses = {
         xs: "px-3 py-1 text-sm",
         sm: "px-4 py-3 text-sm",
         md: "px-5 py-3.5 text-sm",
+        compact: "px-2 py-1.5 text-xs",
+    };
+
+    // Ghost Variant Classes
+    const ghostClasses = {
+        default: "bg-transparent text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30 transition-colors",
+        dark: "bg-transparent text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50 transition-colors",
+        green: "bg-transparent text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950/30 transition-colors",
+        red: "bg-transparent text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30 transition-colors",
+        yellow: "bg-transparent text-yellow-600 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-950/30 transition-colors",
+        purple: "bg-transparent text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-950/30 transition-colors",
+        blue: "bg-transparent text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30 transition-colors",
+        cyan: "bg-transparent text-cyan-600 hover:bg-cyan-50 dark:text-cyan-400 dark:hover:bg-cyan-950/30 transition-colors",
+        teal: "bg-transparent text-teal-600 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/30 transition-colors",
+        lime: "bg-transparent text-lime-600 hover:bg-lime-50 dark:text-lime-400 dark:hover:bg-lime-950/30 transition-colors",
+        pink: "bg-transparent text-pink-600 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-950/30 transition-colors",
+        alternative: "bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors",
+        light: "bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50 transition-colors",
+        neutral: "bg-transparent text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800/40 transition-colors",
+        "soft-dark": "bg-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-900/30 transition-all",
+        muted: "bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/20 transition-colors",
+        minimal: "bg-transparent text-gray-500 hover:bg-gray-100/50 dark:text-gray-500 dark:hover:bg-gray-700/20 transition-colors",
+
     };
 
     // Outline Variant Classes
@@ -88,7 +113,7 @@ const Button: React.FC<ButtonProps> = ({
         default: "bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800",
         dark: "bg-gradient-to-r from-gray-700 to-gray-900 text-white hover:from-gray-800 hover:to-black",
         yellow: "bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 hover:from-yellow-500 hover:to-yellow-700",
-        light: "bg-gradient-to-r from-neutral-50 to-neutral-100 text-neutral-700 hover:from-neutral-100 hover:to-neutral-200 hover:text-cyan-800 border border-cyan-100 shadow-sm hover:shadow-md transition-all duration-200",
+        light: "bg-gradient-to-r from-neutral-50 to-neutral-100 text-neutral-700 hover:from-neutral-100 hover:to-neutral-200 hover:text-cyan-800  shadow-sm hover:shadow-md transition-all duration-200",
     };
 
     // Pill Variant Classes
@@ -112,9 +137,35 @@ const Button: React.FC<ButtonProps> = ({
         default: "bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300",
         light: "bg-brand-100 text-brand-700 border border-brand-200 hover:bg-brand-200 shadow-none disabled:bg-brand-50 disabled:text-brand-400 dark:bg-brand-900/30 dark:text-brand-300 dark:border-brand-700 dark:hover:bg-brand-800/50",
     };
+
+    // Loading spinner component
+    const LoadingSpinner = () => (
+        <svg
+            className="w-4 h-4 animate-spin"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+        >
+            <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+            />
+            <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+        </svg>
+    );
+
     // Get the appropriate classes based on variant and color
     const getVariantClasses = () => {
         if (variant === "primary") return primaryClasses;
+        if (variant === "ghost") return ghostClasses[color as keyof typeof ghostClasses] || ghostClasses.default;
         if (variant === "outline") return outlineClasses[color as keyof typeof outlineClasses] || outlineClasses.default;
         if (variant === "outline-gradient") return outlineGradientClasses[color as keyof typeof outlineGradientClasses] || outlineGradientClasses.default;
         if (variant === "gradient") return gradientClasses[color as keyof typeof gradientClasses] || gradientClasses.blue;
@@ -138,7 +189,7 @@ const Button: React.FC<ButtonProps> = ({
             <div
                 style={gradientBorderStyle}
                 className={`inline-flex ${borderRadius} group transition ${
-                    disabled ? "opacity-50 cursor-not-allowed" : ""
+                    disabled || loading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
             >
                 <button
@@ -154,12 +205,18 @@ const Button: React.FC<ButtonProps> = ({
                                                         "group-hover:from-blue-500 group-hover:to-blue-700"
                     } ${className} ${sizeClasses[size]} ${getVariantClasses()} ${borderRadius}`}
                     onClick={onClick}
-                    disabled={disabled}
+                    disabled={disabled || loading}
                     type={type}
                 >
-                    {startIcon && <span className="flex items-center">{startIcon}</span>}
-                    {children}
-                    {endIcon && <span className="flex items-center">{endIcon}</span>}
+                    {loading ? (
+                        <LoadingSpinner />
+                    ) : (
+                        <>
+                            {startIcon && <span className="flex items-center">{startIcon}</span>}
+                            {children}
+                            {endIcon && <span className="flex items-center">{endIcon}</span>}
+                        </>
+                    )}
                 </button>
             </div>
         );
@@ -170,16 +227,22 @@ const Button: React.FC<ButtonProps> = ({
             className={`inline-flex items-center justify-center gap-2 font-medium transition ${className} ${
                 sizeClasses[size]
             } ${getVariantClasses()} ${borderRadius} ${
-                disabled ? "cursor-not-allowed opacity-50" : ""
-            }`}
+                disabled || loading ? "cursor-not-allowed opacity-50" : ""
+            } ${variant === "ghost" ? "rounded-md" : ""}`}
             onClick={onClick}
-            disabled={disabled}
+            disabled={disabled || loading}
             type={type}
         >
-            {startIcon && <span className="flex items-center">{startIcon}</span>}
-            {title && <span className="flex items-center">{title}</span>}
-            {children}
-            {endIcon && <span className="flex items-center">{endIcon}</span>}
+            {loading ? (
+                <LoadingSpinner />
+            ) : (
+                <>
+                    {startIcon && <span className="flex items-center">{startIcon}</span>}
+                    {title && <span className="flex items-center">{title}</span>}
+                    {children}
+                    {endIcon && <span className="flex items-center">{endIcon}</span>}
+                </>
+            )}
         </button>
     );
 };

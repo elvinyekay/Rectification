@@ -8,6 +8,7 @@ interface InputProps {
     placeholder?: string;
     value?: string | number;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     className?: string;
     min?: string;
     max?: string;
@@ -17,6 +18,7 @@ interface InputProps {
     error?: boolean;
     hint?: string;
     required?: boolean;
+    autoFocus?: boolean;
 }
 
 const Input: FC<InputProps> = ({
@@ -26,6 +28,7 @@ const Input: FC<InputProps> = ({
                                    placeholder,
                                    value,
                                    onChange,
+                                   onKeyDown,
                                    className = "",
                                    min,
                                    max,
@@ -35,6 +38,7 @@ const Input: FC<InputProps> = ({
                                    error = false,
                                    hint,
                                    required,
+                                   autoFocus = false,
                                }) => {
     let inputClasses = ` h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3  dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 ${className}`;
 
@@ -45,7 +49,7 @@ const Input: FC<InputProps> = ({
     } else if (success) {
         inputClasses += `  border-success-500 focus:border-success-300 focus:ring-success-500/20 dark:text-success-400 dark:border-success-500 dark:focus:border-success-800`;
     } else {
-        inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:text-white/90  dark:focus:border-brand-800`;
+        inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-slate-300 focus:ring-slate-300/20 dark:border-gray-700 dark:text-white/90  dark:focus:border-brand-800`;
     }
 
     return (
@@ -57,12 +61,14 @@ const Input: FC<InputProps> = ({
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
+                onKeyDown={onKeyDown}
                 min={min}
                 max={max}
                 step={step}
                 disabled={disabled}
                 className={inputClasses}
                 required={required}
+                autoFocus={autoFocus}
             />
 
             {hint && (
