@@ -1,13 +1,13 @@
 import { useState } from "react";
 import Button from "../../../components/ui/button/Button.tsx";
 import VerifiableFieldEditable from "./VerifiableFieldEditable.tsx";
-import FormSidebar from "../../../components/Formsidebar.tsx";
+import FormSidebar, { type MenuItem } from "../../../components/Formsidebar.tsx";
 
 interface Props {
     isSubmitting: boolean;
 }
 
-const MENU_ITEMS = [
+const INITIAL_MENU_ITEMS: MenuItem[] = [
     {
         id: "chapter1",
         label: "1-ci Fəsil",
@@ -42,12 +42,25 @@ const MENU_ITEMS = [
 const FormSide = ({ isSubmitting }: Props) => {
     const [activeSection, setActiveSection] = useState("chapter1");
     const [activeSubsection, setActiveSubsection] = useState("main");
+    const [menuItems, setMenuItems] = useState(INITIAL_MENU_ITEMS);
 
     const handleMenuSelect = (sectionId: string, subsectionId?: string) => {
         setActiveSection(sectionId);
         if (subsectionId) {
             setActiveSubsection(subsectionId);
         }
+    };
+
+    const handleItemsReorder = (newItems: MenuItem[]) => {
+        setMenuItems(newItems);
+        // Burada API-ya yeni sıralanışı göndərə bilərik
+        console.log("New order:", newItems);
+    };
+
+    const getCurrentPageTitle = () => {
+        const currentChapter = menuItems.find((item) => item.id === activeSection);
+        const currentPage = currentChapter?.children?.find((sub) => sub.id === activeSubsection);
+        return currentPage?.label || "Səhifə tapılmadı";
     };
 
     const renderContent = () => {
@@ -96,28 +109,23 @@ const FormSide = ({ isSubmitting }: Props) => {
 
     return (
         <div className="h-full w-full flex flex-col relative overflow-hidden">
-            {/* Hamburger Button */}
-            <div className="flex justify-end p-4 border-b border-gray-200 dark:border-gray-800">
+            {/* Header with title and sidebar button */}
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {getCurrentPageTitle()}
+                </h2>
+
+                {/* Sidebar button sağ tərəfdə */}
                 <FormSidebar
-                    items={MENU_ITEMS}
+                    items={menuItems}
                     onSelect={handleMenuSelect}
                     activeSection={activeSection}
                     activeSubsection={activeSubsection}
+                    onItemsReorder={handleItemsReorder}
                 />
             </div>
 
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {
-                        MENU_ITEMS.find((item) => item.id === activeSection)
-                            ?.children?.find((sub) => sub.id === activeSubsection)
-                            ?.label
-                    }
-                </h2>
-            </div>
-
-            {/* Content Area - flex-1 ilə tam yer tutur */}
+            {/* Content Area */}
             <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-900">
                 <div className="max-w-2xl">
                     {renderContent()}
