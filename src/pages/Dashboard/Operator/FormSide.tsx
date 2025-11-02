@@ -5,6 +5,7 @@ import FormSidebar, { type MenuItem } from "../../../components/Formsidebar.tsx"
 
 interface Props {
     isSubmitting: boolean;
+    hideActionButtons?: boolean; // New prop to hide action buttons
 }
 
 const INITIAL_MENU_ITEMS: MenuItem[] = [
@@ -39,7 +40,7 @@ const INITIAL_MENU_ITEMS: MenuItem[] = [
     },
 ];
 
-const FormSide = ({ isSubmitting }: Props) => {
+const FormSide = ({ isSubmitting, hideActionButtons = false }: Props) => {
     const [activeSection, setActiveSection] = useState("chapter1");
     const [activeSubsection, setActiveSubsection] = useState("main");
     const [menuItems, setMenuItems] = useState(INITIAL_MENU_ITEMS);
@@ -110,8 +111,8 @@ const FormSide = ({ isSubmitting }: Props) => {
     return (
         <div className="h-full w-full flex flex-col relative overflow-hidden">
             {/* Header with title and sidebar button */}
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {getCurrentPageTitle()}
                 </h2>
 
@@ -126,39 +127,43 @@ const FormSide = ({ isSubmitting }: Props) => {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-gray-900">
+            <div className={`flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-900 ${
+                hideActionButtons ? '' : 'pb-20' // Reduced bottom padding
+            }`}>
                 <div className="max-w-2xl">
                     {renderContent()}
                 </div>
             </div>
 
-            {/* Footer Buttons */}
-            <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-4 flex gap-2 justify-end">
-                <Button
-                    variant="gradient"
-                    color="cyan"
-                    size="xs"
-                    disabled={isSubmitting}
-                >
-                    Keç
-                </Button>
-                <Button
-                    variant="gradient"
-                    color="red"
-                    size="xs"
-                    disabled={isSubmitting}
-                >
-                    Rədd et
-                </Button>
-                <Button
-                    variant="gradient"
-                    color="green"
-                    size="xs"
-                    disabled={isSubmitting}
-                >
-                    Təsdiqlə & Növbəti
-                </Button>
-            </div>
+            {/* Footer Buttons - Only show if not hidden */}
+            {!hideActionButtons && (
+                <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3 flex gap-2 justify-end">
+                    <Button
+                        variant="gradient"
+                        color="cyan"
+                        size="xs"
+                        disabled={isSubmitting}
+                    >
+                        Keç
+                    </Button>
+                    <Button
+                        variant="gradient"
+                        color="red"
+                        size="xs"
+                        disabled={isSubmitting}
+                    >
+                        Rədd et
+                    </Button>
+                    <Button
+                        variant="gradient"
+                        color="green"
+                        size="xs"
+                        disabled={isSubmitting}
+                    >
+                        Təsdiqlə & Növbəti
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

@@ -7,25 +7,190 @@ import {NextDoc, NextDocResponse} from "../../../types/document.ts";
 import Button from "../../../components/ui/button/Button.tsx";
 import { useEffect, useRef, useState} from "react";
 import {ReverseIcon} from "../../../icons";
-import {Maximize2, Minimize2} from "lucide-react";
+import {Maximize2, Minimize2, MoreHorizontal} from "lucide-react";
 import PDFViewer from "../../../components/PDFViewer";
 import FormSide from "./FormSide.tsx";
-
 
 const OperatorHome = () => {
     const [reversed, setReversed] = useState(false);
     const [fullPane, setFullPane] = useState<"left" | "right" | null>(null);
+    const [showActionsMenu, setShowActionsMenu] = useState(false);
+    const [compactMode, setCompactMode] = useState(false);
     const leftContainerRef = useRef<HTMLDivElement>(null);
     const rightContainerRef = useRef<HTMLDivElement>(null);
     const lastPaneRef = useRef<"left" | "right" | null>(null);
+    const toolbarRef = useRef<HTMLDivElement>(null);
     const {data, isLoading, isFetching} = useGetNextDocumentQuery();
     const [, {isLoading: isSubmitting}] = useSubmitDocumentMutation();
 
     const hasDoc = (r: NextDocResponse): r is NextDoc =>
         r && !r.done && !!r.document;
 
-
     const isLoadingState = isLoading || isFetching;
+
+    // Responsive toolbar detection
+    useEffect(() => {
+        const handleResize = () => {
+            if (toolbarRef.current) {
+                const width = toolbarRef.current.offsetWidth;
+                setCompactMode(width < 500);
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(handleResize);
+        if (toolbarRef.current) {
+            resizeObserver.observe(toolbarRef.current);
+        }
+
+        handleResize(); // Initial check
+
+        return () => resizeObserver.disconnect();
+    }, []);
+
+    // Responsive Bottom Toolbar Component
+    const ResponsiveToolbar = () => (
+        <div
+            ref={toolbarRef}
+            className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-2"
+        >
+            <div className="flex items-center justify-between gap-2">
+                {/* Layout Controls */}
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => setReversed(v => !v)}
+                        className="p-2 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        title="Panelləri çevir"
+                    >
+                        <ReverseIcon className="w-4 h-4" />
+                    </button>
+
+                    {!compactMode && (
+                        <>
+                            <button
+                                onClick={() => setFullPane(fullPane === "left" ? null : "left")}
+                                className={`flex items-center gap-1 px-3 py-2 text-xs rounded-lg border transition-all ${
+                                    fullPane === "left"
+                                        ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700'
+                                        : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                }`}
+                                title="PDF tam ekran"
+                            >
+                                {fullPane === "left" ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                                PDF {fullPane === "left" ? "Bərpa" : "Tam"}
+                            </button>
+
+                            <button
+                                onClick={() => setFullPane(fullPane === "right" ? null : "right")}
+                                className={`flex items-center gap-1 px-3 py-2 text-xs rounded-lg border transition-all ${
+                                    fullPane === "right"
+                                        ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700'
+                                        : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                }`}
+                                title="Form tam ekran"
+                            >
+                                {fullPane === "right" ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                                Form {fullPane === "right" ? "Bərpa" : "Tam"}
+                            </button>
+                        </>
+                    )}
+
+                    {compactMode && (
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowActionsMenu(!showActionsMenu)}
+                                className="p-2 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                title="Layout seçimləri"
+                            >
+                                <MoreHorizontal className="w-4 h-4" />
+                            </button>
+
+                            {showActionsMenu && (
+                                <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[150px]">
+                                    <button
+                                        onClick={() => {
+                                            setFullPane(fullPane === "left" ? null : "left");
+                                            setShowActionsMenu(false);
+                                        }}
+                                        className={`w-full flex items-center gap-2 text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg ${
+                                            fullPane === "left" ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400' : ''
+                                        }`}
+                                    >
+                                        {fullPane === "left" ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                                        PDF {fullPane === "left" ? "Bərpa" : "Tam"}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setFullPane(fullPane === "right" ? null : "right");
+                                            setShowActionsMenu(false);
+                                        }}
+                                        className={`w-full flex items-center gap-2 text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 last:rounded-b-lg ${
+                                            fullPane === "right" ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400' : ''
+                                        }`}
+                                    >
+                                        {fullPane === "right" ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                                        Form {fullPane === "right" ? "Bərpa" : "Tam"}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-1">
+                    {compactMode ? (
+                        // Compact mode: Only primary action visible
+                        <>
+                            <Button
+                                variant="gradient"
+                                color="green"
+                                size="xs"
+                                disabled={isSubmitting}
+                            >
+                                Təsdiqlə
+                            </Button>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowActionsMenu(!showActionsMenu)}
+                                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                                >
+                                    <MoreHorizontal className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        // Full mode: All buttons visible
+                        <>
+                            <Button
+                                variant="gradient"
+                                color="cyan"
+                                size="xs"
+                                disabled={isSubmitting}
+                            >
+                                Keç
+                            </Button>
+                            <Button
+                                variant="gradient"
+                                color="red"
+                                size="xs"
+                                disabled={isSubmitting}
+                            >
+                                Rədd et
+                            </Button>
+                            <Button
+                                variant="gradient"
+                                color="green"
+                                size="xs"
+                                disabled={isSubmitting}
+                            >
+                                Təsdiqlə & Növbəti
+                            </Button>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 
     const renderLeft = (fullscreen: boolean) => (
         <div
@@ -34,18 +199,20 @@ const OperatorHome = () => {
             onMouseEnter={() => (lastPaneRef.current = "left")}
             onFocusCapture={() => (lastPaneRef.current = "left")}
         >
-            <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center justify-between px-3 ">
                 <span className="text-xs text-gray-500">
                     {isLoadingState ? "Yüklənir..." : ""}
                 </span>
-                <button
-                    type="button"
-                    aria-label={fullscreen ? "Paneli bərpa et" : "Paneli böyüt"}
-                    onClick={() => setFullPane(fullscreen ? null : "left")}
-                    className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-600 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300 disabled:opacity-60"
-                >
-                    {fullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>}
-                </button>
+                {fullscreen && (
+                    <button
+                        type="button"
+                        aria-label="Paneli bərpa et"
+                        onClick={() => setFullPane(null)}
+                        className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-600 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
+                    >
+                        <Minimize2 size={14}/>
+                    </button>
+                )}
             </div>
 
             <div className="flex-1 overflow-auto">
@@ -71,18 +238,20 @@ const OperatorHome = () => {
             onMouseEnter={() => (lastPaneRef.current = "right")}
             onFocusCapture={() => (lastPaneRef.current = "right")}
         >
-            <div className="flex items-center justify-end px-3 py-2">
-                <button
-                    type="button"
-                    aria-label={fullscreen ? "Paneli bərpa et" : "Paneli böyüt"}
-                    onClick={() => setFullPane(fullscreen ? null : "right")}
-                    className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-600 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
-                >
-                    {fullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>}
-                </button>
+            <div className="flex items-center justify-end px-3 py-1">
+                {fullscreen && (
+                    <button
+                        type="button"
+                        aria-label="Paneli bərpa et"
+                        onClick={() => setFullPane(null)}
+                        className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-600 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
+                    >
+                        <Minimize2 size={14}/>
+                    </button>
+                )}
             </div>
             <div className="flex-1 overflow-auto">
-                <FormSide isSubmitting={isSubmitting}/>
+                <FormSide isSubmitting={isSubmitting} hideActionButtons={true} />
             </div>
         </div>
     );
@@ -112,39 +281,42 @@ const OperatorHome = () => {
         return () => window.removeEventListener("keydown", onKeyDown);
     }, []);
 
-    return (
-        <div className="h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)]">
+    // Close menus when clicking outside
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setShowActionsMenu(false);
+        };
 
-            <div
-                className="flex items-center justify-center gap-2 px-3 pb-1 border-b border-gray-200 dark:border-gray-800">
-                <Button
-                    onClick={() => setReversed(v => !v)}
-                    className="absolute px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-100
-                     dark:border-gray-700 dark:hover:bg-white/5 z-9"
-                    variant={"gradient"}
-                    color={"light"}
-                    size={"compact"}
-                >
-                    <ReverseIcon/>
-                </Button>
+        if (showActionsMenu) {
+            document.addEventListener('click', handleClickOutside);
+            return () => document.removeEventListener('click', handleClickOutside);
+        }
+    }, [showActionsMenu]);
+
+    return (
+        <div className="h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] flex flex-col">
+            {/* Main Content */}
+            <div className="flex-1 overflow-hidden">
+                {fullPane ? (
+                    <div className="h-full">
+                        {fullPane === "left" ? renderLeft(true) : renderRight(true)}
+                    </div>
+                ) : (
+                    <SplitView
+                        left={renderLeft(false)}
+                        right={renderRight(false)}
+                        initial={56}
+                        minLeft={30}
+                        minRight={28}
+                        reversed={reversed}
+                    />
+                )}
             </div>
-            {fullPane ? (
-                <div className="h-full">
-                    {fullPane === "left" ? renderLeft(true) : renderRight(true)}
-                </div>
-            ) : (
-                <SplitView
-                    left={renderLeft(false)}
-                    right={renderRight(false)}
-                    initial={56}
-                    minLeft={30}
-                    minRight={28}
-                    reversed={reversed}
-                />
-            )}
+
+            {/* Responsive Bottom Toolbar */}
+            <ResponsiveToolbar />
         </div>
     );
 }
-
 
 export default OperatorHome;
