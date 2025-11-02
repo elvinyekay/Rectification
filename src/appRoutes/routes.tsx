@@ -10,6 +10,7 @@ import NotFound from "../pages/OtherPage/NotFound.tsx";
 import RoleLanding from "../pages/Dashboard/RoleLanding.tsx";
 import OperatorHome from "../pages/Dashboard/Operator/OperatorHome.tsx";
 import AutoTrimPage from "../pages/Dashboard/Operator/AutoTrimPage.tsx";
+import HotkeyManagementPage from "../pages/HotkeyPage/Hotkeymanagementpage.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -31,6 +32,10 @@ export const router = createBrowserRouter([
                     {
                         path: '/rectify/auto',
                         element: <AutoTrimPage/>
+                    },
+                    {
+                        path: '/operator/hotkeys',
+                        element: <HotkeyManagementPage/>
                     },
                     // {
                     //     path: '/profile',

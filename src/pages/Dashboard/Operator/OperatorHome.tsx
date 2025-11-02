@@ -199,21 +199,13 @@ const OperatorHome = () => {
             onMouseEnter={() => (lastPaneRef.current = "left")}
             onFocusCapture={() => (lastPaneRef.current = "left")}
         >
-            <div className="flex items-center justify-between px-3 ">
-                <span className="text-xs text-gray-500">
-                    {isLoadingState ? "Yüklənir..." : ""}
-                </span>
-                {fullscreen && (
-                    <button
-                        type="button"
-                        aria-label="Paneli bərpa et"
-                        onClick={() => setFullPane(null)}
-                        className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-600 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
-                    >
-                        <Minimize2 size={14}/>
-                    </button>
-                )}
-            </div>
+            {!fullscreen && (
+                <div className="flex items-center justify-between px-3 py-1">
+                    <span className="text-xs text-gray-500">
+                        {isLoadingState ? "Yüklənir..." : ""}
+                    </span>
+                </div>
+            )}
 
             <div className="flex-1 overflow-auto">
                 {data && hasDoc(data) ? (
@@ -238,18 +230,11 @@ const OperatorHome = () => {
             onMouseEnter={() => (lastPaneRef.current = "right")}
             onFocusCapture={() => (lastPaneRef.current = "right")}
         >
-            <div className="flex items-center justify-end px-3 py-1">
-                {fullscreen && (
-                    <button
-                        type="button"
-                        aria-label="Paneli bərpa et"
-                        onClick={() => setFullPane(null)}
-                        className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-600 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
-                    >
-                        <Minimize2 size={14}/>
-                    </button>
-                )}
-            </div>
+            {!fullscreen && (
+                <div className="flex items-center justify-end px-3 py-1">
+                    {/* Header space for non-fullscreen mode */}
+                </div>
+            )}
             <div className="flex-1 overflow-auto">
                 <FormSide isSubmitting={isSubmitting} hideActionButtons={true} />
             </div>

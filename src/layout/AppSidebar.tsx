@@ -8,6 +8,7 @@ import {
 import {useSidebar} from "../context/SidebarContext";
 import {Role} from "../types/auth.ts";
 import {useAppSelector} from "../store/hooks.ts";
+import {Keyboard} from "lucide-react";
 
 type NavItem = {
     name: string;
@@ -36,12 +37,12 @@ const navItems: NavItem[] = [
         path: "/operator/work",
         roles: ['operator']
     },
-    // {
-    //     icon: <TaskIcon/>,
-    //     name: "Pdf trim",
-    //     path: "/rectify/auto",
-    //     roles: ['operator']
-    // },
+    {
+        icon: <Keyboard/>,
+        name: "Qısayol Düymələri",
+        path: "/operator/hotkeys",
+        roles: ['operator']
+    },
 ];
 
 const othersItems: NavItem[] = [];

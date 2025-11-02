@@ -271,7 +271,7 @@ export default function PDFViewer({ url }: PDFViewerProps) {
     return (
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
             <div className="flex h-full flex-col">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-white p-3 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-white p-2 shadow-sm">
                     <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-1">
                         {prevButton}
                         {nextButton}
